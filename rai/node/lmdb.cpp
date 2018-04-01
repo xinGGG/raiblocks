@@ -102,6 +102,15 @@ size_t rai::mdb_val::size () const
 	return value.mv_size;
 }
 
+rai::mdb_val::operator rai::account_info () const
+{
+	rai::account_info result;
+	assert (value.mv_size == sizeof (result));
+	static_assert (sizeof (rai::account_info::head) + sizeof (rai::account_info::rep_block) + sizeof (rai::account_info::open_block) + sizeof (rai::account_info::balance) + sizeof (rai::account_info::modified) + sizeof (rai::account_info::block_count) == sizeof (result), "Class not packed");
+	std::copy (reinterpret_cast<uint8_t const *> (value.mv_data), reinterpret_cast<uint8_t const *> (value.mv_data) + sizeof (result), reinterpret_cast<uint8_t *> (&result));
+	return result;
+}
+
 rai::mdb_val::operator rai::uint256_union () const
 {
 	rai::uint256_union result;

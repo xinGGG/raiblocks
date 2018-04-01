@@ -2,6 +2,7 @@
 
 #include <rai/lib/blocks.hpp>
 #include <rai/node/utility.hpp>
+#include <rai/node/lmdb.hpp>
 
 namespace rai
 {

@@ -2,6 +2,7 @@
 
 #include <rai/common.hpp>
 
+struct MDB_txn;
 namespace rai
 {
 class block_store;

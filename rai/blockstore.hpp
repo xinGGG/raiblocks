@@ -1,6 +1,7 @@
 #pragma once
 
 #include <rai/common.hpp>
+#include <rai/node/lmdb.hpp>
 
 namespace rai
 {

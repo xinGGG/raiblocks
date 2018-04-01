@@ -314,6 +314,8 @@ add_library (node
 	rai/node/bootstrap.hpp
 	rai/node/common.cpp
 	rai/node/common.hpp
+	rai/node/lmdb.cpp
+	rai/node/lmdb.hpp
 	rai/node/node.hpp
 	rai/node/node.cpp
 	rai/node/openclwork.cpp

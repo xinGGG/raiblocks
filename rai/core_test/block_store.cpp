@@ -602,7 +602,7 @@ TEST (block_store, upgrade_v2_v3)
 		rai::transaction transaction (store.environment, nullptr, true);
 		rai::genesis genesis;
 		auto hash (genesis.hash ());
-		genesis.initialize (transaction, store);
+		store.initialize (transaction, genesis);
 		rai::stat stats;
 		rai::ledger ledger (store, stats);
 		rai::change_block change (hash, key1.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);

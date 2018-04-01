@@ -922,7 +922,7 @@ size_t rai::block_store::account_count (MDB_txn * transaction_a)
 
 void rai::block_store::account_put (MDB_txn * transaction_a, rai::account const & account_a, rai::account_info const & info_a)
 {
-	auto status (mdb_put (transaction_a, accounts, rai::mdb_val (account_a), info_a.val (), 0));
+	auto status (mdb_put (transaction_a, accounts, rai::mdb_val (account_a), rai::mdb_val (info_a), 0));
 	assert (status == 0);
 }
 

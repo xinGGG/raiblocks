@@ -262,11 +262,6 @@ bool rai::account_info::operator!= (rai::account_info const & other_a) const
 	return !(*this == other_a);
 }
 
-rai::mdb_val rai::account_info::val () const
-{
-	return rai::mdb_val (sizeof (*this), const_cast<rai::account_info *> (this));
-}
-
 rai::block_counts::block_counts () :
 send (0),
 receive (0),

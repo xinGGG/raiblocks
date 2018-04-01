@@ -1,6 +1,7 @@
 #include <queue>
 #include <rai/blockstore.hpp>
 #include <rai/versioning.hpp>
+#include <rai/node/common.hpp>
 
 namespace rai
 {
@@ -265,6 +266,17 @@ checksum (0)
 			checksum_put (transaction, 0, 0, 0);
 		}
 	}
+}
+
+void rai::block_store::initialize (MDB_txn * transaction_a, rai::genesis const & genesis_a)
+{
+	auto hash_l (genesis_a.hash ());
+	assert (latest_begin (transaction_a) == latest_end ());
+	block_put (transaction_a, hash_l, *genesis_a.open);
+	account_put (transaction_a, genesis_account, { hash_l, genesis_a.open->hash (), genesis_a.open->hash (), std::numeric_limits<rai::uint128_t>::max (), rai::seconds_since_epoch (), 1 });
+	representation_put (transaction_a, genesis_account, std::numeric_limits<rai::uint128_t>::max ());
+	checksum_put (transaction_a, 0, 0, hash_l);
+	frontier_put (transaction_a, hash_l, genesis_account);
 }
 
 void rai::block_store::version_put (MDB_txn * transaction_a, int version_a)

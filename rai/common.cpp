@@ -390,11 +390,6 @@ bool rai::block_info::operator== (rai::block_info const & other_a) const
 	return account == other_a.account && balance == other_a.balance;
 }
 
-rai::mdb_val rai::block_info::val () const
-{
-	return rai::mdb_val (sizeof (*this), const_cast<rai::block_info *> (this));
-}
-
 bool rai::vote::operator== (rai::vote const & other_a) const
 {
 	return sequence == other_a.sequence && *block == *other_a.block && account == other_a.account && signature == other_a.signature;

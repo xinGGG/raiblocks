@@ -316,11 +316,6 @@ bool rai::pending_info::operator== (rai::pending_info const & other_a) const
 	return source == other_a.source && amount == other_a.amount;
 }
 
-rai::mdb_val rai::pending_info::val () const
-{
-	return rai::mdb_val (sizeof (*this), const_cast<rai::pending_info *> (this));
-}
-
 rai::pending_key::pending_key (rai::account const & account_a, rai::block_hash const & hash_a) :
 account (account_a),
 hash (hash_a)

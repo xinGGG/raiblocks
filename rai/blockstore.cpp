@@ -928,7 +928,7 @@ void rai::block_store::account_put (MDB_txn * transaction_a, rai::account const 
 
 void rai::block_store::pending_put (MDB_txn * transaction_a, rai::pending_key const & key_a, rai::pending_info const & pending_a)
 {
-	auto status (mdb_put (transaction_a, pending, key_a.val (), pending_a.val (), 0));
+	auto status (mdb_put (transaction_a, pending, key_a.val (), rai::mdb_val (pending_a), 0));
 	assert (status == 0);
 }
 

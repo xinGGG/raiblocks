@@ -652,19 +652,6 @@ signature (rai::sign_message (prv_a, account_a, hash ()))
 {
 }
 
-rai::vote::vote (MDB_val const & value_a)
-{
-	rai::bufferstream stream (reinterpret_cast<uint8_t const *> (value_a.mv_data), value_a.mv_size);
-	auto error (rai::read (stream, account.bytes));
-	assert (!error);
-	error = rai::read (stream, signature.bytes);
-	assert (!error);
-	error = rai::read (stream, sequence);
-	assert (!error);
-	block = rai::deserialize_block (stream);
-	assert (block != nullptr);
-}
-
 rai::uint256_union rai::vote::hash () const
 {
 	rai::uint256_union result;

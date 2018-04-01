@@ -123,7 +123,6 @@ public:
 	vote (bool &, rai::stream &);
 	vote (bool &, rai::stream &, rai::block_type);
 	vote (rai::account const &, rai::raw_key const &, uint64_t, std::shared_ptr<rai::block>);
-	vote (MDB_val const &);
 	rai::uint256_union hash () const;
 	bool operator== (rai::vote const &) const;
 	bool operator!= (rai::vote const &) const;

@@ -111,6 +111,15 @@ rai::mdb_val::operator rai::account_info () const
 	return result;
 }
 
+rai::mdb_val::operator rai::pending_info () const
+{
+	rai::pending_info result;
+	assert (value.mv_size == sizeof (result));
+	static_assert (sizeof (rai::pending_info::source) + sizeof (rai::pending_info::amount) == sizeof (result), "Packed class");
+	std::copy (reinterpret_cast<uint8_t const *> (value.mv_data), reinterpret_cast<uint8_t const *> (value.mv_data) + sizeof (result), reinterpret_cast<uint8_t *> (&result));
+	return result;
+}
+
 rai::mdb_val::operator rai::uint256_union () const
 {
 	rai::uint256_union result;

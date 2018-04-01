@@ -275,13 +275,6 @@ amount (0)
 {
 }
 
-rai::pending_info::pending_info (MDB_val const & val_a)
-{
-	assert (val_a.mv_size == sizeof (*this));
-	static_assert (sizeof (source) + sizeof (amount) == sizeof (*this), "Packed class");
-	std::copy (reinterpret_cast<uint8_t const *> (val_a.mv_data), reinterpret_cast<uint8_t const *> (val_a.mv_data) + sizeof (*this), reinterpret_cast<uint8_t *> (this));
-}
-
 rai::pending_info::pending_info (rai::account const & source_a, rai::amount const & amount_a) :
 source (source_a),
 amount (amount_a)

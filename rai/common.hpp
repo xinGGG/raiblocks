@@ -75,7 +75,6 @@ class pending_info
 {
 public:
 	pending_info ();
-	pending_info (MDB_val const &);
 	pending_info (rai::account const &, rai::amount const &);
 	void serialize (rai::stream &) const;
 	bool deserialize (rai::stream &);

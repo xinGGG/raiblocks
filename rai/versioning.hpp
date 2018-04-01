@@ -1,8 +1,8 @@
 #pragma once
 
 #include <rai/lib/blocks.hpp>
-#include <rai/node/utility.hpp>
 #include <rai/node/lmdb.hpp>
+#include <rai/node/utility.hpp>
 
 namespace rai
 {

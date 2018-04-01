@@ -1,7 +1,7 @@
 #include <queue>
 #include <rai/blockstore.hpp>
-#include <rai/versioning.hpp>
 #include <rai/node/common.hpp>
+#include <rai/versioning.hpp>
 
 namespace rai
 {

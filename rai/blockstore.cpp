@@ -928,13 +928,13 @@ void rai::block_store::account_put (MDB_txn * transaction_a, rai::account const 
 
 void rai::block_store::pending_put (MDB_txn * transaction_a, rai::pending_key const & key_a, rai::pending_info const & pending_a)
 {
-	auto status (mdb_put (transaction_a, pending, key_a.val (), rai::mdb_val (pending_a), 0));
+	auto status (mdb_put (transaction_a, pending, rai::mdb_val (key_a), rai::mdb_val (pending_a), 0));
 	assert (status == 0);
 }
 
 void rai::block_store::pending_del (MDB_txn * transaction_a, rai::pending_key const & key_a)
 {
-	auto status (mdb_del (transaction_a, pending, key_a.val (), nullptr));
+	auto status (mdb_del (transaction_a, pending, rai::mdb_val (key_a), nullptr));
 	assert (status == 0);
 }
 
@@ -947,7 +947,7 @@ bool rai::block_store::pending_exists (MDB_txn * transaction_a, rai::pending_key
 bool rai::block_store::pending_get (MDB_txn * transaction_a, rai::pending_key const & key_a, rai::pending_info & pending_a)
 {
 	rai::mdb_val value;
-	auto status (mdb_get (transaction_a, pending, key_a.val (), value));
+	auto status (mdb_get (transaction_a, pending, mdb_val (key_a), value));
 	assert (status == 0 || status == MDB_NOTFOUND);
 	bool result;
 	if (status == MDB_NOTFOUND)
@@ -969,7 +969,7 @@ bool rai::block_store::pending_get (MDB_txn * transaction_a, rai::pending_key co
 
 rai::store_iterator rai::block_store::pending_begin (MDB_txn * transaction_a, rai::pending_key const & key_a)
 {
-	rai::store_iterator result (transaction_a, pending, key_a.val ());
+	rai::store_iterator result (transaction_a, pending, mdb_val (key_a));
 	return result;
 }
 

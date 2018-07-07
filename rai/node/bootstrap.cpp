@@ -1802,7 +1802,7 @@ std::unique_ptr<rai::block> rai::bulk_pull_blocks_server::get_next ()
 
 	if (!out_of_bounds)
 	{
-		if (stream->first.size () != 0)
+		if (stream != connection->node->store.block_info_end ())
 		{
 			auto current = rai::uint256_union (stream->first);
 			if (current < request->max_hash)

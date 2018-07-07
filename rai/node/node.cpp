@@ -1549,7 +1549,7 @@ void rai::block_processor::queue_unchecked (MDB_txn * transaction_a, rai::block_
 	auto cached (node.store.unchecked_get (transaction_a, hash_a));
 	for (auto i (cached.begin ()), n (cached.end ()); i != n; ++i)
 	{
-		node.store.unchecked_del (transaction_a, hash_a, **i);
+		node.store.unchecked_del (transaction_a, hash_a, *i);
 		add (*i, std::chrono::steady_clock::time_point ());
 	}
 	std::lock_guard<std::mutex> lock (node.gap_cache.mutex);
@@ -4413,11 +4413,7 @@ bool rai::handle_node_options (boost::program_options::variables_map & vm)
 		rai::transaction transaction (node.node->store.environment, nullptr, false);
 		for (auto i (node.node->store.vote_begin (transaction)), n (node.node->store.vote_end ()); i != n; ++i)
 		{
-			bool error (false);
-			rai::bufferstream stream (reinterpret_cast<uint8_t const *> (i->second.data ()), i->second.size ());
-			auto vote (std::make_shared<rai::vote> (error, stream));
-			assert (!error);
-			std::cerr << boost::str (boost::format ("%1%\n") % vote->to_json ());
+			std::cerr << boost::str (boost::format ("%1%\n") % i->second->to_json ());
 		}
 	}
 	else

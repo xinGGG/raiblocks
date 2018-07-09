@@ -43,22 +43,23 @@ public:
 	impl (std::move (impl_a))
 	{
 		assert (impl != nullptr);
+		set_values ();
 	}
 	store_iterator (rai::store_iterator<T, U> && other_a) :
+	current (std::move (other_a.current)),
 	impl (std::move (other_a.impl))
 	{
 	}
 	rai::store_iterator<T, U> & operator++ ()
 	{
 		++*impl;
-		current.first = static_cast<T> (impl->current.first);
-		current.second = static_cast<U> (impl->current.second);
+		set_values ();
 		return *this;
 	}
 	rai::store_iterator<T, U> & operator= (rai::store_iterator<T, U> && other_a)
 	{
 		impl = std::move (other_a.impl);
-		current = other_a.current;
+		current = std::move (other_a.current);
 		return *this;
 	}
 	rai::store_iterator<T, U> & operator= (rai::store_iterator<T, U> const &) = delete;
@@ -75,6 +76,25 @@ public:
 		return !(*this == other_a);
 	}
 private:
+	void set_values ()
+	{
+		if (impl->current.first.size () != 0)
+		{
+			current.first = static_cast<T> (impl->current.first);
+		}
+		else
+		{
+			current.first = T ();
+		}
+		if (impl->current.second.size () != 0)
+		{
+			current.second = static_cast<U> (impl->current.second);
+		}
+		else
+		{
+			current.second = U ();
+		}
+	}
 	std::pair<T, U> current;
 	std::unique_ptr<rai::store_iterator_impl<T, U>> impl;
 };
@@ -272,6 +292,7 @@ public:
 	MDB_dbi meta;
 private:
 	MDB_dbi block_database (rai::block_type);
+	template <typename T>
 	std::unique_ptr<rai::block> block_random (MDB_txn *, MDB_dbi);
 	MDB_val block_raw_get (MDB_txn *, rai::block_hash const &, rai::block_type &);
 	void block_raw_put (MDB_txn *, MDB_dbi, rai::block_hash const &, MDB_val);

@@ -1,8 +1,8 @@
 #include <queue>
 #include <rai/blockstore.hpp>
 #include <rai/node/common.hpp>
-#include <rai/versioning.hpp>
 #include <rai/node/wallet.hpp>
+#include <rai/versioning.hpp>
 
 namespace rai
 {
@@ -56,7 +56,7 @@ public:
 };
 }
 
-template<typename T, typename U>
+template <typename T, typename U>
 rai::store_iterator_impl<T, U>::store_iterator_impl (MDB_txn * transaction_a, MDB_dbi db_a) :
 cursor (nullptr)
 {
@@ -79,13 +79,13 @@ cursor (nullptr)
 	}
 }
 
-template<typename T, typename U>
+template <typename T, typename U>
 rai::store_iterator_impl<T, U>::store_iterator_impl (std::nullptr_t) :
 cursor (nullptr)
 {
 }
 
-template<typename T, typename U>
+template <typename T, typename U>
 rai::store_iterator_impl<T, U>::store_iterator_impl (MDB_txn * transaction_a, MDB_dbi db_a, MDB_val const & val_a) :
 cursor (nullptr)
 {
@@ -109,7 +109,7 @@ cursor (nullptr)
 	}
 }
 
-template<typename T, typename U>
+template <typename T, typename U>
 rai::store_iterator_impl<T, U>::store_iterator_impl (rai::store_iterator_impl<T, U> && other_a)
 {
 	cursor = other_a.cursor;
@@ -117,7 +117,7 @@ rai::store_iterator_impl<T, U>::store_iterator_impl (rai::store_iterator_impl<T,
 	current = other_a.current;
 }
 
-template<typename T, typename U>
+template <typename T, typename U>
 rai::store_iterator_impl<T, U>::~store_iterator_impl ()
 {
 	if (cursor != nullptr)
@@ -126,7 +126,7 @@ rai::store_iterator_impl<T, U>::~store_iterator_impl ()
 	}
 }
 
-template<typename T, typename U>
+template <typename T, typename U>
 rai::store_iterator_impl<T, U> & rai::store_iterator_impl<T, U>::operator++ ()
 {
 	assert (cursor != nullptr);
@@ -142,7 +142,7 @@ rai::store_iterator_impl<T, U> & rai::store_iterator_impl<T, U>::operator++ ()
 	return *this;
 }
 
-template<typename T, typename U>
+template <typename T, typename U>
 rai::store_iterator_impl<T, U> & rai::store_iterator_impl<T, U>::operator= (rai::store_iterator_impl<T, U> && other_a)
 {
 	if (cursor != nullptr)
@@ -156,13 +156,13 @@ rai::store_iterator_impl<T, U> & rai::store_iterator_impl<T, U>::operator= (rai:
 	return *this;
 }
 
-template<typename T, typename U>
+template <typename T, typename U>
 std::pair<rai::mdb_val, rai::mdb_val> * rai::store_iterator_impl<T, U>::operator-> ()
 {
 	return &current;
 }
 
-template<typename T, typename U>
+template <typename T, typename U>
 bool rai::store_iterator_impl<T, U>::operator== (rai::store_iterator_impl<T, U> const & other_a) const
 {
 	auto result (current.first.data () == other_a.current.first.data ());
@@ -172,13 +172,13 @@ bool rai::store_iterator_impl<T, U>::operator== (rai::store_iterator_impl<T, U> 
 	return result;
 }
 
-template<typename T, typename U>
+template <typename T, typename U>
 bool rai::store_iterator_impl<T, U>::operator!= (rai::store_iterator_impl<T, U> const & other_a) const
 {
 	return !(*this == other_a);
 }
 
-template<typename T, typename U>
+template <typename T, typename U>
 void rai::store_iterator_impl<T, U>::next_dup ()
 {
 	assert (cursor != nullptr);
@@ -189,7 +189,7 @@ void rai::store_iterator_impl<T, U>::next_dup ()
 	}
 }
 
-template<typename T, typename U>
+template <typename T, typename U>
 void rai::store_iterator_impl<T, U>::clear ()
 {
 	current.first = rai::mdb_val ();
@@ -207,25 +207,25 @@ template class rai::store_iterator_impl<rai::uint256_union, rai::wallet_value>;
 
 rai::store_iterator<rai::block_hash, rai::block_info> rai::block_store::block_info_begin (MDB_txn * transaction_a, rai::block_hash const & hash_a)
 {
-	rai::store_iterator<rai::block_hash, rai::block_info> result (std::make_unique<rai::store_iterator_impl<rai::block_hash, rai::block_info>>(transaction_a, blocks_info, rai::mdb_val (hash_a)));
+	rai::store_iterator<rai::block_hash, rai::block_info> result (std::make_unique<rai::store_iterator_impl<rai::block_hash, rai::block_info>> (transaction_a, blocks_info, rai::mdb_val (hash_a)));
 	return result;
 }
 
 rai::store_iterator<rai::block_hash, rai::block_info> rai::block_store::block_info_begin (MDB_txn * transaction_a)
 {
-	rai::store_iterator<rai::block_hash, rai::block_info> result (std::make_unique<rai::store_iterator_impl<rai::block_hash, rai::block_info>>(transaction_a, blocks_info));
+	rai::store_iterator<rai::block_hash, rai::block_info> result (std::make_unique<rai::store_iterator_impl<rai::block_hash, rai::block_info>> (transaction_a, blocks_info));
 	return result;
 }
 
 rai::store_iterator<rai::block_hash, rai::block_info> rai::block_store::block_info_end ()
 {
-	rai::store_iterator<rai::block_hash, rai::block_info> result (std::make_unique<rai::store_iterator_impl<rai::block_hash, rai::block_info>>(nullptr));
+	rai::store_iterator<rai::block_hash, rai::block_info> result (std::make_unique<rai::store_iterator_impl<rai::block_hash, rai::block_info>> (nullptr));
 	return result;
 }
 
 rai::store_iterator<rai::account, rai::uint128_union> rai::block_store::representation_begin (MDB_txn * transaction_a)
 {
-	rai::store_iterator<rai::account, rai::uint128_union> result (std::make_unique<rai::store_iterator_impl<rai::account, rai::uint128_union>>(transaction_a, representation));
+	rai::store_iterator<rai::account, rai::uint128_union> result (std::make_unique<rai::store_iterator_impl<rai::account, rai::uint128_union>> (transaction_a, representation));
 	return result;
 }
 
@@ -237,13 +237,13 @@ rai::store_iterator<rai::account, rai::uint128_union> rai::block_store::represen
 
 rai::store_iterator<rai::block_hash, std::shared_ptr<rai::block>> rai::block_store::unchecked_begin (MDB_txn * transaction_a)
 {
-	rai::store_iterator<rai::block_hash, std::shared_ptr<rai::block>> result (std::make_unique<rai::store_iterator_impl<rai::account, std::shared_ptr<rai::block>>>(transaction_a, unchecked));
+	rai::store_iterator<rai::block_hash, std::shared_ptr<rai::block>> result (std::make_unique<rai::store_iterator_impl<rai::account, std::shared_ptr<rai::block>>> (transaction_a, unchecked));
 	return result;
 }
 
 rai::store_iterator<rai::block_hash, std::shared_ptr<rai::block>> rai::block_store::unchecked_begin (MDB_txn * transaction_a, rai::block_hash const & hash_a)
 {
-	rai::store_iterator<rai::block_hash, std::shared_ptr<rai::block>> result (std::make_unique<rai::store_iterator_impl<rai::block_hash, std::shared_ptr<rai::block>>>(transaction_a, unchecked, rai::mdb_val (hash_a)));
+	rai::store_iterator<rai::block_hash, std::shared_ptr<rai::block>> result (std::make_unique<rai::store_iterator_impl<rai::block_hash, std::shared_ptr<rai::block>>> (transaction_a, unchecked, rai::mdb_val (hash_a)));
 	return result;
 }
 
@@ -255,7 +255,7 @@ rai::store_iterator<rai::block_hash, std::shared_ptr<rai::block>> rai::block_sto
 
 rai::store_iterator<rai::account, std::shared_ptr<rai::vote>> rai::block_store::vote_begin (MDB_txn * transaction_a)
 {
-	return rai::store_iterator<rai::account, std::shared_ptr<rai::vote>> (std::make_unique<rai::store_iterator_impl<rai::account, std::shared_ptr<rai::vote>>>(transaction_a, vote));
+	return rai::store_iterator<rai::account, std::shared_ptr<rai::vote>> (std::make_unique<rai::store_iterator_impl<rai::account, std::shared_ptr<rai::vote>>> (transaction_a, vote));
 }
 
 rai::store_iterator<rai::account, std::shared_ptr<rai::vote>> rai::block_store::vote_end ()
@@ -437,7 +437,7 @@ void rai::block_store::upgrade_v2_to_v3 (MDB_txn * transaction_a)
 {
 	version_put (transaction_a, 3);
 	mdb_drop (transaction_a, representation, 0);
-	for (auto i (rai::store_iterator<rai::account, rai::account_info_v5> (std::make_unique<rai::store_iterator_impl<rai::account, rai::account_info_v5>>(transaction_a, accounts))), n (rai::store_iterator<rai::account, rai::account_info_v5> (nullptr)); i != n; ++i)
+	for (auto i (rai::store_iterator<rai::account, rai::account_info_v5> (std::make_unique<rai::store_iterator_impl<rai::account, rai::account_info_v5>> (transaction_a, accounts))), n (rai::store_iterator<rai::account, rai::account_info_v5> (nullptr)); i != n; ++i)
 	{
 		rai::account account_l (i->first);
 		rai::account_info_v5 info (i->second);
@@ -471,7 +471,7 @@ void rai::block_store::upgrade_v3_to_v4 (MDB_txn * transaction_a)
 void rai::block_store::upgrade_v4_to_v5 (MDB_txn * transaction_a)
 {
 	version_put (transaction_a, 5);
-	for (auto i (rai::store_iterator<rai::account, rai::account_info_v5> (std::make_unique<rai::store_iterator_impl<rai::account, rai::account_info_v5>>(transaction_a, accounts))), n (rai::store_iterator<rai::account, rai::account_info_v5> (nullptr)); i != n; ++i)
+	for (auto i (rai::store_iterator<rai::account, rai::account_info_v5> (std::make_unique<rai::store_iterator_impl<rai::account, rai::account_info_v5>> (transaction_a, accounts))), n (rai::store_iterator<rai::account, rai::account_info_v5> (nullptr)); i != n; ++i)
 	{
 		rai::account_info_v5 info (i->second);
 		rai::block_hash successor (0);
@@ -549,7 +549,7 @@ void rai::block_store::upgrade_v8_to_v9 (MDB_txn * transaction_a)
 			rai::vectorstream stream (vector);
 			dummy.serialize (stream);
 		}
-		auto status1 (mdb_put (transaction_a, vote, rai::mdb_val(i->first), rai::mdb_val (vector.size (), vector.data ()), 0));
+		auto status1 (mdb_put (transaction_a, vote, rai::mdb_val (i->first), rai::mdb_val (vector.size (), vector.data ()), 0));
 		assert (status1 == 0);
 		assert (!error);
 	}
@@ -723,10 +723,10 @@ std::unique_ptr<rai::block> rai::block_store::block_random (MDB_txn * transactio
 {
 	rai::block_hash hash;
 	rai::random_pool.GenerateBlock (hash.bytes.data (), hash.bytes.size ());
-	rai::store_iterator<rai::block_hash, std::shared_ptr<T>> existing (std::make_unique<rai::store_iterator_impl<rai::block_hash, std::shared_ptr<T>>>(transaction_a, database, rai::mdb_val (hash)));
+	rai::store_iterator<rai::block_hash, std::shared_ptr<T>> existing (std::make_unique<rai::store_iterator_impl<rai::block_hash, std::shared_ptr<T>>> (transaction_a, database, rai::mdb_val (hash)));
 	if (existing == rai::store_iterator<rai::block_hash, std::shared_ptr<T>> (nullptr))
 	{
-		existing = rai::store_iterator<rai::block_hash, std::shared_ptr<T>> (std::make_unique<rai::store_iterator_impl<rai::block_hash, std::shared_ptr<T>>>(transaction_a, database));
+		existing = rai::store_iterator<rai::block_hash, std::shared_ptr<T>> (std::make_unique<rai::store_iterator_impl<rai::block_hash, std::shared_ptr<T>>> (transaction_a, database));
 	}
 	auto end (rai::store_iterator<rai::block_hash, std::shared_ptr<T>> (nullptr));
 	assert (existing != end);
@@ -1017,13 +1017,13 @@ bool rai::block_store::pending_get (MDB_txn * transaction_a, rai::pending_key co
 
 rai::store_iterator<rai::pending_key, rai::pending_info> rai::block_store::pending_begin (MDB_txn * transaction_a, rai::pending_key const & key_a)
 {
-	rai::store_iterator<rai::pending_key, rai::pending_info> result (std::make_unique<rai::store_iterator_impl<rai::pending_key, rai::pending_info>>(transaction_a, pending, mdb_val (key_a)));
+	rai::store_iterator<rai::pending_key, rai::pending_info> result (std::make_unique<rai::store_iterator_impl<rai::pending_key, rai::pending_info>> (transaction_a, pending, mdb_val (key_a)));
 	return result;
 }
 
 rai::store_iterator<rai::pending_key, rai::pending_info> rai::block_store::pending_begin (MDB_txn * transaction_a)
 {
-	rai::store_iterator<rai::pending_key, rai::pending_info> result (std::make_unique<rai::store_iterator_impl<rai::pending_key, rai::pending_info>>(transaction_a, pending));
+	rai::store_iterator<rai::pending_key, rai::pending_info> result (std::make_unique<rai::store_iterator_impl<rai::pending_key, rai::pending_info>> (transaction_a, pending));
 	return result;
 }
 
@@ -1299,13 +1299,13 @@ std::shared_ptr<rai::vote> rai::block_store::vote_max (MDB_txn * transaction_a, 
 
 rai::store_iterator<rai::account, rai::account_info> rai::block_store::latest_begin (MDB_txn * transaction_a, rai::account const & account_a)
 {
-	rai::store_iterator<rai::account, rai::account_info> result (std::make_unique<rai::store_iterator_impl<rai::account, rai::account_info>>(transaction_a, accounts, rai::mdb_val (account_a)));
+	rai::store_iterator<rai::account, rai::account_info> result (std::make_unique<rai::store_iterator_impl<rai::account, rai::account_info>> (transaction_a, accounts, rai::mdb_val (account_a)));
 	return result;
 }
 
 rai::store_iterator<rai::account, rai::account_info> rai::block_store::latest_begin (MDB_txn * transaction_a)
 {
-	rai::store_iterator<rai::account, rai::account_info> result (std::make_unique<rai::store_iterator_impl<rai::account, rai::account_info>>(transaction_a, accounts));
+	rai::store_iterator<rai::account, rai::account_info> result (std::make_unique<rai::store_iterator_impl<rai::account, rai::account_info>> (transaction_a, accounts));
 	return result;
 }
 

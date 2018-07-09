@@ -27,7 +27,10 @@ public:
 class mdb_val
 {
 public:
-	enum class no_value { dummy };
+	enum class no_value
+	{
+		dummy
+	};
 	mdb_val ();
 	mdb_val (rai::account_info const &);
 	mdb_val (rai::block_info const &);
@@ -59,7 +62,7 @@ public:
 	operator MDB_val * () const;
 	operator MDB_val const & () const;
 	MDB_val value;
-	std::shared_ptr<std::vector <uint8_t>> buffer;
+	std::shared_ptr<std::vector<uint8_t>> buffer;
 };
 
 /**

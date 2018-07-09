@@ -68,6 +68,10 @@ cursor (nullptr)
 	{
 		auto status3 (mdb_cursor_get (cursor, &current.first.value, &current.second.value, MDB_GET_CURRENT));
 		assert (status3 == 0 || status3 == MDB_NOTFOUND);
+		if (current.first.size () != sizeof (T))
+		{
+			clear ();
+		}
 	}
 	else
 	{
@@ -87,13 +91,17 @@ cursor (nullptr)
 {
 	auto status (mdb_cursor_open (transaction_a, db_a, &cursor));
 	assert (status == 0);
-	current.first.value = val_a;
+	current.first = val_a;
 	auto status2 (mdb_cursor_get (cursor, &current.first.value, &current.second.value, MDB_SET_RANGE));
 	assert (status2 == 0 || status2 == MDB_NOTFOUND);
 	if (status2 != MDB_NOTFOUND)
 	{
 		auto status3 (mdb_cursor_get (cursor, &current.first.value, &current.second.value, MDB_GET_CURRENT));
 		assert (status3 == 0 || status3 == MDB_NOTFOUND);
+		if (current.first.size () != sizeof (T))
+		{
+			clear ();
+		}
 	}
 	else
 	{
@@ -124,6 +132,10 @@ rai::store_iterator_impl<T, U> & rai::store_iterator_impl<T, U>::operator++ ()
 	assert (cursor != nullptr);
 	auto status (mdb_cursor_get (cursor, &current.first.value, &current.second.value, MDB_NEXT));
 	if (status == MDB_NOTFOUND)
+	{
+		clear ();
+	}
+	if (current.first.size () != sizeof (T))
 	{
 		clear ();
 	}
@@ -190,6 +202,7 @@ template class rai::store_iterator_impl<rai::uint256_union, rai::uint128_union>;
 template class rai::store_iterator_impl<rai::uint256_union, rai::uint256_union>;
 template class rai::store_iterator_impl<rai::uint256_union, std::shared_ptr<rai::block>>;
 template class rai::store_iterator_impl<rai::uint256_union, std::shared_ptr<rai::vote>>;
+template class rai::store_iterator_impl<std::array<char, 64>, rai::mdb_val::no_value>;
 template class rai::store_iterator_impl<rai::uint256_union, rai::wallet_value>;
 
 rai::store_iterator<rai::block_hash, rai::block_info> rai::block_store::block_info_begin (MDB_txn * transaction_a, rai::block_hash const & hash_a)

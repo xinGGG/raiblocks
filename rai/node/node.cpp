@@ -663,7 +663,8 @@ rai::musig_stage0_info::musig_stage0_info (std::pair<rai::public_key, rai::uint2
 session_id (session_id_a),
 representative (representative_a),
 root (block_a->root ()),
-block (block_a)
+block (block_a),
+created (std::chrono::steady_clock::now ())
 {
 	std::copy (r_value_a, r_value_a + sizeof (bignum256modm), r_value);
 }
@@ -671,7 +672,8 @@ block (block_a)
 rai::stapled_vote_info::stapled_vote_info (std::shared_ptr<rai::state_block> block_a) :
 root (block_a->root ()),
 successor (block_a),
-successor_hash (block_a->hash ())
+successor_hash (block_a->hash ()),
+created (std::chrono::steady_clock::now ())
 {
 }
 
@@ -771,33 +773,36 @@ rai::uint256_union rai::vote_stapler::stage1 (rai::public_key node_id, rai::uint
 {
 	auto result (false);
 	auto session_id (std::make_pair (node_id, request_id));
-	auto musig_stage0_it (stage0_info.get<0> ().find (session_id));
 	rai::stapler_s_value_cache_key s_value_cache_key = { node_id, request_id, rb_total };
 	rai::uint256_union s_value;
-	if (musig_stage0_it == stage0_info.get<0> ().end ())
 	{
-		result = true;
-		auto s_value_cache_it (s_value_cache.get<0> ().find (s_value_cache_key));
-		if (s_value_cache_it != s_value_cache.get<0> ().end ())
+		std::lock_guard<std::mutex> lock (mutex);
+		auto musig_stage0_it (stage0_info.get<0> ().find (session_id));
+		if (musig_stage0_it == stage0_info.get<0> ().end ())
 		{
-			if (s_value_cache_it->agg_pubkey == agg_pubkey && s_value_cache_it->l_value == l_value)
+			result = true;
+			auto s_value_cache_it (s_value_cache.get<0> ().find (s_value_cache_key));
+			if (s_value_cache_it != s_value_cache.get<0> ().end ())
 			{
-				s_value = s_value_cache_it->s_value;
+				if (s_value_cache_it->agg_pubkey == agg_pubkey && s_value_cache_it->l_value == l_value)
+				{
+					s_value = s_value_cache_it->s_value;
+				}
 			}
 		}
-	}
-	else
-	{
-		auto stapled_vote_it (stapled_votes.get<0> ().find (musig_stage0_it->root));
-		if (stapled_vote_it == stapled_votes.get<0> ().end ())
+		else
 		{
-			result = true;
-			assert (false);
-		}
-		else if (musig_stage0_it->block != stapled_vote_it->successor)
-		{
-			result = true;
-			assert (false);
+			auto stapled_vote_it (stapled_votes.get<0> ().find (musig_stage0_it->root));
+			if (stapled_vote_it == stapled_votes.get<0> ().end ())
+			{
+				result = true;
+				assert (false);
+			}
+			else if (musig_stage0_it->block != stapled_vote_it->successor)
+			{
+				result = true;
+				assert (false);
+			}
 		}
 	}
 	rai::raw_key rep_key;
@@ -853,6 +858,29 @@ size_t rai::hash_value (rai::stapler_s_value_cache_key const & value_a)
 	size_t output;
 	blake2b_final (&state, reinterpret_cast<uint8_t *> (&output), sizeof (size_t));
 	return output;
+}
+
+std::shared_ptr<rai::block> rai::vote_stapler::remove_root (rai::uint256_union root);
+{
+	std::lock_guard<std::mutex> lock (mutex);
+	std::shared_ptr<rai::block> result;
+	rai::block_hash successor (root);
+	while (!successor.is_zero ())
+	{
+		stage0_info.get<1> ().erase (stage0_info.get<1> ().find (successor));
+		auto stapled_vote_it (stapled_votes.get<0> ().find (successor));
+		successor = 0;
+		if (stapled_vote_it != stapled_votes.get<0> ().end ())
+		{
+			if (successor == root)
+			{
+				result = stapled_vote_it->successor;
+			}
+			successor = result->hash ();
+			stapled_votes.get<0> ().erase (stapled_vote_it);
+		}
+	}
+	return result;
 }
 
 void rai::network::receive_action (boost::system::error_code const & error, size_t size_a)
@@ -4173,6 +4201,10 @@ void rai::active_transactions::announce_votes ()
 				// Broadcast winner
 				if (node.ledger.could_fit (transaction, *election_l->status.winner))
 				{
+					if (i->announcements > 0)
+					{
+						election_l->compute_rep_votes (transaction);
+					}
 					if (std::chrono::system_clock::now () >= node.config.generate_hash_votes_at)
 					{
 						node.network.republish_block (transaction, election_l->status.winner, false);
@@ -4188,7 +4220,6 @@ void rai::active_transactions::announce_votes ()
 					}
 					else
 					{
-						election_l->compute_rep_votes (transaction);
 						node.network.republish_block (transaction, election_l->status.winner);
 					}
 				}
@@ -4316,6 +4347,18 @@ bool rai::active_transactions::start (std::pair<std::shared_ptr<rai::block>, std
 	assert (blocks_a.first != nullptr);
 	auto error (true);
 	std::lock_guard<std::mutex> lock (mutex);
+	auto primary_block (blocks_a.first);
+	auto root (primary_block->root ());
+	auto vote_stapled_block (node.vote_stapler.remove_root (root));
+	if (vote_stapled_block)
+	{
+		if (primary_block.hash () != vote_stapled_block.hash ())
+		{
+			blocks_a = std::make_pair (vote_stapled_block, primary_block);
+			primary_block = vote_stapled_block;
+		}
+	}
+	auto existing (roots.find (root));
 	if (!stopped)
 	{
 		auto primary_block (blocks_a.first);

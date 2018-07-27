@@ -215,6 +215,7 @@ public:
 		musig_stage0_res,
 		musig_stage1_req,
 		musig_stage1_res,
+		publish_vote_staple,
 
 		// bootstrap specific
 		initiate,

@@ -574,6 +574,21 @@ void rai::rep_xor_solver::calculate_top_reps ()
 	}
 }
 
+namespace
+{
+#ifdef _MSC_VER
+bool parity_odd (uint64_t input)
+{
+	return __popcnt64 (input) % 2;
+}
+#else
+bool parity_odd (uint64_t input)
+{
+	return __builtin_parityl (input);
+}
+#endif
+}
+
 std::vector<std::vector<uint64_t *>> rai::rep_xor_solver::solve_xor_check (std::vector<uint64_t *> options, uint64_t * xor_check, size_t check_size, size_t possible_cap_log2)
 {
 	if (options.size () == 0)
@@ -674,7 +689,7 @@ std::vector<std::vector<uint64_t *>> rai::rep_xor_solver::solve_xor_check (std::
 			{
 				chunks_xor ^= matrix[i][chunk] & free_cols_flip[f][chunk];
 			}
-			if (__builtin_parityl (chunks_xor))
+			if (parity_odd (chunks_xor))
 			{
 				free_cols_flip[f][col_chunk] |= col_chunk_mask;
 			}
@@ -684,7 +699,7 @@ std::vector<std::vector<uint64_t *>> rai::rep_xor_solver::solve_xor_check (std::
 		{
 			chunks_xor ^= matrix[i][chunk] & base_cols[chunk];
 		}
-		if (__builtin_parityl (chunks_xor))
+		if (parity_odd (chunks_xor))
 		{
 			base_cols[col_chunk] |= col_chunk_mask;
 		}
@@ -3444,7 +3459,7 @@ boost::optional<rai::uint256_union> rai::peer_container::assign_syn_cookie (rai:
 	std::unique_lock<std::mutex> lock (syn_cookie_mutex);
 	unsigned & ip_cookies = syn_cookies_per_ip[ip_addr];
 	boost::optional<rai::uint256_union> result;
-	if (ip_cookies < max_peers_per_ip)
+	if (rai::rai_network == rai::rai_networks::rai_test_network || ip_cookies < max_peers_per_ip)
 	{
 		if (syn_cookies.find (endpoint) == syn_cookies.end ())
 		{
@@ -4616,7 +4631,7 @@ bool rai::peer_container::insert (rai::endpoint const & endpoint_a, unsigned ver
 						}
 						++i;
 					}
-					if (ip_peers >= max_peers_per_ip || (is_legacy && legacy_ip_peers >= max_legacy_peers_per_ip))
+					if ((rai::rai_network != rai::rai_networks::rai_test_network && ip_peers >= max_peers_per_ip) || (is_legacy && legacy_ip_peers >= max_legacy_peers_per_ip))
 					{
 						result = true;
 					}
@@ -4792,7 +4807,7 @@ bool rai::peer_container::contacted (rai::endpoint const & endpoint_a, unsigned 
 	{
 		insert (endpoint_l, version_a);
 	}
-	else if (!known_peer (endpoint_l) && peers.get<rai::peer_by_ip_addr> ().count (endpoint_l.address ()) < max_peers_per_ip)
+	else if (!known_peer (endpoint_l) && (rai::rai_network == rai::rai_networks::rai_test_network || peers.get<rai::peer_by_ip_addr> ().count (endpoint_l.address ()) < max_peers_per_ip))
 	{
 		should_handshake = true;
 	}

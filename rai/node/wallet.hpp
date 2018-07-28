@@ -131,6 +131,7 @@ public:
 	void enter_initial_password ();
 	bool valid_password ();
 	bool enter_password (std::string const &);
+	void check_self_weight (MDB_txn *, rai::public_key const &);
 	rai::public_key insert_adhoc (rai::raw_key const &, bool = true);
 	rai::public_key insert_adhoc (MDB_txn *, rai::raw_key const &, bool = true);
 	void insert_watch (MDB_txn *, rai::public_key const &);

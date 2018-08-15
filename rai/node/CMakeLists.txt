@@ -23,6 +23,7 @@ add_library (node
 	cli.cpp
 	common.cpp
 	common.hpp
+	curve25519_dalek.hpp
 	node.hpp
 	node.cpp
 	openclwork.cpp
@@ -48,6 +49,12 @@ ExternalProject_Add(
 	BINARY_DIR "${CMAKE_SOURCE_DIR}/curve25519_dalek_c"
 	INSTALL_COMMAND ""
 	LOG_BUILD ON)
+
+ExternalProject_Add_Step(curve25519_dalek_c forcebuild
+    COMMAND ${CMAKE_COMMAND} -E echo "Force build of curve25519_dalek_c"
+    DEPENDEES update
+    DEPENDERS configure
+    ALWAYS 1)
 
 add_dependencies (node curve25519_dalek_c)
 
